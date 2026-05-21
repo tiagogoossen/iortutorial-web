@@ -164,6 +164,11 @@
       const statusEl = document.getElementById("status");
       const overlayEl = document.getElementById("overlay");
 
+      function cheerpjAppPath(fileName) {
+        const basePath = window.location.pathname.replace(/[^/]*$/, "");
+        return `/app${basePath}${fileName}`.replace(/\/{2,}/g, "/");
+      }
+
       async function start() {
         statusEl.textContent = "Initializing CheerpJ";
         await cheerpjInit({ version: 17 });
@@ -172,7 +177,7 @@
 
         statusEl.textContent = "Launching app";
         overlayEl.style.display = "none";
-        await cheerpjRunJar("/app/IORTutorial-dark.jar");
+        await cheerpjRunJar(cheerpjAppPath("IORTutorial-dark.jar"));
       }
 
       window.addEventListener("error", (event) => {
