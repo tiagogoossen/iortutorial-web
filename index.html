@@ -1,0 +1,193 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>IORTutorial Web</title>
+    <script src="https://cjrtnc.leaningtech.com/4.3/loader.js"></script>
+    <style>
+      :root {
+        color-scheme: dark;
+        --bg: #111318;
+        --panel: #1b1f27;
+        --panel-2: #242a34;
+        --text: #e7ecf3;
+        --muted: #aeb8c6;
+        --accent: #72a7ff;
+        --border: #343c49;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      html,
+      body {
+        width: 100%;
+        height: 100%;
+        margin: 0;
+      }
+
+      body {
+        background: var(--bg);
+        color: var(--text);
+        font-family:
+          Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont,
+          "Segoe UI", sans-serif;
+        overflow: hidden;
+      }
+
+      .shell {
+        display: grid;
+        grid-template-rows: auto 1fr;
+        width: 100vw;
+        height: 100vh;
+      }
+
+      .topbar {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        min-height: 48px;
+        padding: 8px 14px;
+        background: var(--panel);
+        border-bottom: 1px solid var(--border);
+      }
+
+      .title {
+        min-width: 0;
+        font-size: 14px;
+        font-weight: 650;
+        line-height: 1.2;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+
+      .status {
+        color: var(--muted);
+        font-size: 13px;
+        line-height: 1.2;
+        text-align: right;
+      }
+
+      .display-wrap {
+        position: relative;
+        min-height: 0;
+        background: var(--bg);
+      }
+
+      #cheerpj-display {
+        width: 100%;
+        height: 100%;
+      }
+
+      .overlay {
+        position: absolute;
+        inset: 0;
+        display: grid;
+        place-items: center;
+        padding: 24px;
+        background: var(--bg);
+      }
+
+      .loader {
+        width: min(420px, 100%);
+        padding: 20px;
+        background: var(--panel);
+        border: 1px solid var(--border);
+        border-radius: 8px;
+      }
+
+      .loader-title {
+        margin: 0 0 8px;
+        font-size: 16px;
+        font-weight: 700;
+      }
+
+      .loader-copy {
+        margin: 0;
+        color: var(--muted);
+        font-size: 13px;
+        line-height: 1.45;
+      }
+
+      .bar {
+        width: 100%;
+        height: 6px;
+        margin-top: 16px;
+        overflow: hidden;
+        background: var(--panel-2);
+        border-radius: 999px;
+      }
+
+      .bar::before {
+        display: block;
+        width: 42%;
+        height: 100%;
+        background: var(--accent);
+        border-radius: inherit;
+        animation: load 1.15s ease-in-out infinite;
+        content: "";
+      }
+
+      @keyframes load {
+        0% {
+          transform: translateX(-105%);
+        }
+        100% {
+          transform: translateX(250%);
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <main class="shell">
+      <header class="topbar">
+        <div class="title">Interactive Operations Research Tutorial</div>
+        <div class="status" id="status">Loading Java runtime</div>
+      </header>
+      <section class="display-wrap">
+        <div id="cheerpj-display"></div>
+        <div class="overlay" id="overlay">
+          <div class="loader">
+            <p class="loader-title">Starting IORTutorial</p>
+            <p class="loader-copy">
+              The Java runtime and application JAR are loading in your browser.
+            </p>
+            <div class="bar"></div>
+          </div>
+        </div>
+      </section>
+    </main>
+    <script>
+      const statusEl = document.getElementById("status");
+      const overlayEl = document.getElementById("overlay");
+
+      async function start() {
+        statusEl.textContent = "Initializing CheerpJ";
+        await cheerpjInit({ version: 17 });
+
+        cheerpjCreateDisplay(-1, -1, document.getElementById("cheerpj-display"));
+
+        statusEl.textContent = "Launching app";
+        overlayEl.style.display = "none";
+        await cheerpjRunJar("/app/IORTutorial-dark.jar");
+      }
+
+      window.addEventListener("error", (event) => {
+        statusEl.textContent = "Startup failed";
+        overlayEl.style.display = "grid";
+        overlayEl.querySelector(".loader-title").textContent = "Could not start IORTutorial";
+        overlayEl.querySelector(".loader-copy").textContent = event.message || "Check the browser console for details.";
+      });
+
+      start().catch((error) => {
+        statusEl.textContent = "Startup failed";
+        overlayEl.style.display = "grid";
+        overlayEl.querySelector(".loader-title").textContent = "Could not start IORTutorial";
+        overlayEl.querySelector(".loader-copy").textContent = error && error.message ? error.message : String(error);
+      });
+    </script>
+  </body>
+</html>
